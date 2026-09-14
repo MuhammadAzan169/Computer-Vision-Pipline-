@@ -55,6 +55,10 @@ function Attendance() {
   const [people, setPeople] = useState<Person[]>(registeredPeople);
   const [regOpen, setRegOpen] = useState(false);
   const [form, setForm] = useState({ name: "", id: "" });
+  const [peopleStatus, setPeopleStatus] = useState("all");
+  const filteredPeople = people.filter(
+    (p) => peopleStatus === "all" || p.status === peopleStatus,
+  );
 
   const rows = useMemo(
     () =>
@@ -285,9 +289,17 @@ function Attendance() {
         </Panel>
 
         <Panel className="overflow-hidden">
-          <PanelHead title="Registered people" hint={`${people.length} enrolled profiles`} />
+          <PanelHead title="Registered people" hint={`${people.length} enrolled profiles`}>
+            <Tabs value={peopleStatus} onValueChange={setPeopleStatus}>
+              <TabsList>
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="active">Active</TabsTrigger>
+                <TabsTrigger value="pending">Pending</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </PanelHead>
           <div className="max-h-[420px] divide-y divide-line overflow-y-auto">
-            {people.map((p) => (
+            {filteredPeople.map((p) => (
               <div
                 key={p.id}
                 className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3"

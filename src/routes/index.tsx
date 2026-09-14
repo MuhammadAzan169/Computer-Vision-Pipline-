@@ -1,8 +1,16 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Activity } from "lucide-react";
 import { pipelines } from "@/lib/pipelines";
 import { Chip, Kpi, Panel, PanelHead, SectionTitle, SeverityChip } from "@/components/vision/kit";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import feedLobby from "@/assets/feed-lobby.jpg";
 import feedKitchen from "@/assets/feed-kitchen.jpg";
 import feedGate from "@/assets/feed-gate.jpg";
@@ -81,6 +89,11 @@ const stream = [
 ];
 
 function Overview() {
+  const [streamSeverity, setStreamSeverity] = useState("all");
+  const filteredStream = stream.filter(
+    (e) => streamSeverity === "all" || e.severity === streamSeverity,
+  );
+
   return (
     <>
       <SectionTitle title="Operations Overview" sub="14 CAMERAS · 5 PIPELINES · MODEL v2.4">
@@ -144,9 +157,20 @@ function Overview() {
             <Chip tone="rose" dot pulse>
               Live
             </Chip>
+            <Select value={streamSeverity} onValueChange={setStreamSeverity}>
+              <SelectTrigger className="w-[110px]">
+                <SelectValue placeholder="Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="critical">Critical</SelectItem>
+                <SelectItem value="warning">Warning</SelectItem>
+                <SelectItem value="info">Info</SelectItem>
+              </SelectContent>
+            </Select>
           </PanelHead>
           <div className="divide-y divide-line">
-            {stream.map((e) => (
+            {filteredStream.map((e) => (
               <div key={e.id} className="row-in px-4 py-3">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
                   <div className="min-w-0">

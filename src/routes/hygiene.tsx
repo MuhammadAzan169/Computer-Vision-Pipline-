@@ -24,7 +24,13 @@ import {
   SeverityChip,
 } from "@/components/vision/kit";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { complianceTrend, kitchenStaff, violations } from "@/lib/mock";
 import feedKitchen from "@/assets/feed-kitchen.jpg";
 
@@ -58,6 +64,14 @@ function Hygiene() {
   const [severity, setSeverity] = useState("all");
   const list = violations.filter((v) => severity === "all" || v.severity === severity);
   const compliant = kitchenStaff.filter((s) => s.mask && s.gloves && s.hairCover).length;
+
+  const [complianceFilter, setComplianceFilter] = useState("all");
+  const filteredStaff = kitchenStaff.filter((s) => {
+    const isCompliant = s.mask && s.gloves && s.hairCover;
+    if (complianceFilter === "compliant") return isCompliant;
+    if (complianceFilter === "violation") return !isCompliant;
+    return true;
+  });
 
   return (
     <>
@@ -109,9 +123,20 @@ function Hygiene() {
           />
 
           <Panel className="overflow-hidden">
-            <PanelHead title="Per-person compliance" hint="Live read of each station" />
+            <PanelHead title="Per-person compliance" hint="Live read of each station">
+              <Select value={complianceFilter} onValueChange={setComplianceFilter}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="compliant">Compliant</SelectItem>
+                  <SelectItem value="violation">Violation</SelectItem>
+                </SelectContent>
+              </Select>
+            </PanelHead>
             <div className="divide-y divide-line">
-              {kitchenStaff.map((s) => {
+              {filteredStaff.map((s) => {
                 const items = [
                   { label: "Mask", ok: s.mask },
                   { label: "Gloves", ok: s.gloves },
@@ -215,12 +240,17 @@ function Hygiene() {
 
           <Panel className="overflow-hidden">
             <PanelHead title="Violation feed" hint="Most recent first">
-              <Tabs value={severity} onValueChange={setSeverity}>
-                <TabsList>
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="critical">Critical</TabsTrigger>
-                </TabsList>
-              </Tabs>
+              <Select value={severity} onValueChange={setSeverity}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="critical">Critical</SelectItem>
+                  <SelectItem value="warning">Warning</SelectItem>
+                  <SelectItem value="info">Info</SelectItem>
+                </SelectContent>
+              </Select>
             </PanelHead>
             {list.length === 0 ? (
               <EmptyState

@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Square,
   Upload,
+  Download,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -23,14 +24,7 @@ import { cn } from "@/lib/utils";
 import { Chip, type Tone } from "./kit";
 
 export type FeedStatus =
-  | "idle"
-  | "requesting"
-  | "connecting"
-  | "live"
-  | "demo"
-  | "stopped"
-  | "media"
-  | "error";
+  "idle" | "requesting" | "connecting" | "live" | "demo" | "stopped" | "media" | "error";
 
 type FeedPanelProps = {
   title: string;
@@ -70,9 +64,11 @@ export function FeedPanel({
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [deviceId, setDeviceId] = useState<string>("");
   const [errorText, setErrorText] = useState("");
-  const [upload, setUpload] = useState<{ url: string; kind: "image" | "video"; name: string } | null>(
-    null,
-  );
+  const [upload, setUpload] = useState<{
+    url: string;
+    kind: "image" | "video";
+    name: string;
+  } | null>(null);
   const [dragging, setDragging] = useState(false);
   const [clock, setClock] = useState("--:--:--");
 
@@ -133,14 +129,19 @@ export function FeedPanel({
         setDevices(list);
         const active = stream.getVideoTracks()[0];
         const activeId =
-          preferred ?? list.find((d) => d.label === active?.label)?.deviceId ?? list[0]?.deviceId ?? "";
+          preferred ??
+          list.find((d) => d.label === active?.label)?.deviceId ??
+          list[0]?.deviceId ??
+          "";
         setDeviceId(activeId);
         setUpload(null);
         setStatus("live");
         toast.success("Camera connected", { description: active?.label || "Default camera" });
       } catch {
         setStatus("error");
-        setErrorText("Permission denied or no camera available. You can continue on the demo feed.");
+        setErrorText(
+          "Permission denied or no camera available. You can continue on the demo feed.",
+        );
         toast.error("Could not start the camera");
       }
     },
@@ -151,6 +152,13 @@ export function FeedPanel({
     stopStream();
     setStatus("stopped");
     toast("Session stopped");
+  };
+  const handleDownload = () => {
+    if (!upload) return;
+    const a = document.createElement("a");
+    a.href = upload.url; // swap for the processed-result URL once that exists
+    a.download = upload.name;
+    a.click();
   };
 
   const handleFile = (file?: File) => {
@@ -316,6 +324,11 @@ export function FeedPanel({
           <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()}>
             <Upload className="size-3.5" /> Upload media
           </Button>
+          {status === "media" && upload ? (
+            <Button size="sm" variant="outline" onClick={handleDownload}>
+              <Download className="size-3.5" /> Download result
+            </Button>
+          ) : null}
           <input
             ref={fileRef}
             type="file"

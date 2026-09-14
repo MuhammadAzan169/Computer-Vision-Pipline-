@@ -1124,16 +1124,6 @@ Do not spend time implementing actual AI models, backend services, APIs, databas
 
 Focus completely on creating an exceptionally beautiful, realistic, interactive, responsive, production-quality frontend experience.
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/c997bf97-02f8-4a53-95e1-178a7fbf7aed).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
 ## Development
 
 Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).

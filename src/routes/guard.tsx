@@ -15,6 +15,13 @@ import {
   type Tone,
 } from "@/components/vision/kit";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { guardEvents, guardStateLabels, guardTimeline, type GuardState } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 import feedGuard from "@/assets/feed-guard.jpg";
@@ -53,6 +60,11 @@ function Guard() {
   const meta = stateMeta[current];
   const Icon = meta.icon;
   const critical = current === "sleeping" || current === "absent";
+
+  const [eventSeverity, setEventSeverity] = useState("all");
+  const filteredEvents = guardEvents.filter(
+    (e) => eventSeverity === "all" || e.severity === eventSeverity,
+  );
 
   return (
     <>
@@ -187,9 +199,21 @@ function Guard() {
           </Panel>
 
           <Panel className="overflow-hidden">
-            <PanelHead title="Alert history" hint="This shift" />
+            <PanelHead title="Alert history" hint="This shift">
+              <Select value={eventSeverity} onValueChange={setEventSeverity}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="critical">Critical</SelectItem>
+                  <SelectItem value="warning">Warning</SelectItem>
+                  <SelectItem value="info">Info</SelectItem>
+                </SelectContent>
+              </Select>
+            </PanelHead>
             <div className="divide-y divide-line">
-              {guardEvents.map((e) => (
+              {filteredEvents.map((e) => (
                 <div key={e.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
                   <div className="min-w-0">
                     <p className="truncate text-[12px] font-semibold">{e.event}</p>

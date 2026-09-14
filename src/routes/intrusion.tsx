@@ -14,6 +14,13 @@ import {
   SeverityChip,
 } from "@/components/vision/kit";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { intrusionEvents, zoneCameras } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 import feedWarehouse from "@/assets/feed-warehouse.jpg";
@@ -39,6 +46,11 @@ export const Route = createFileRoute("/intrusion")({
 
 function Intrusion() {
   const [breach, setBreach] = useState(false);
+
+  const [eventStatus, setEventStatus] = useState("all");
+  const filteredIntrusions = intrusionEvents.filter(
+    (e) => eventStatus === "all" || e.status === eventStatus,
+  );
 
   return (
     <>
@@ -167,6 +179,17 @@ function Intrusion() {
 
       <Panel className="overflow-hidden">
         <PanelHead title="Intrusion event log" hint="Snapshots kept for 30 days">
+          <Select value={eventStatus} onValueChange={setEventStatus}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Filter" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="open">Open</SelectItem>
+              <SelectItem value="resolved">Resolved</SelectItem>
+              <SelectItem value="dismissed">Dismissed</SelectItem>
+            </SelectContent>
+          </Select>
           <DownloadDialog
             reportName="Intrusion log"
             trigger={
@@ -177,7 +200,7 @@ function Intrusion() {
           />
         </PanelHead>
         <div className="grid gap-3 p-3 sm:grid-cols-2 xl:grid-cols-4">
-          {intrusionEvents.map((e) => (
+          {filteredIntrusions.map((e) => (
             <article key={e.id} className="row-in overflow-hidden rounded-lg bg-panel ring-1 ring-line">
               <div className="relative aspect-video overflow-hidden bg-ink">
                 <img
